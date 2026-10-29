@@ -43,11 +43,18 @@ resolved launch inputs to each CLI.
 
 ## Installation
 
-Hermes' catalog installer scans community plugins and blocks any plugin that
-uses private Hermes APIs. Workers uses those APIs by design (see
-[UPGRADE_CHECKLIST.md](UPGRADE_CHECKLIST.md)), so `hermes plugins install` will
-reject it with a dangerous-verdict message even with `--force`. Install it as a
-checkout instead:
+Install from GitHub:
+
+```sh
+hermes plugins install KaiyuWang99/hermes-workers --enable
+```
+
+The installer labels this as a custom (unreviewed) source and runs its security
+scan; the current release scans as safe. Because the plugin integrates with
+private Hermes APIs, pin a compatible Hermes version and check
+[UPGRADE_CHECKLIST.md](UPGRADE_CHECKLIST.md) after upgrades.
+
+As a fallback (offline install, or a Hermes build that refuses custom sources):
 
 ```sh
 mkdir -p ~/.hermes/plugins
@@ -64,9 +71,7 @@ git -C ~/.hermes/plugins/workers pull
 Restart the gateway after installing or updating, and reload Hermes Desktop so
 the settings bundle is refreshed. Then open **Settings → Plugins → Workers**.
 
-The plugin declares `requires_hermes: ">=0.22.5"`. Because it integrates with
-private Hermes APIs, check [UPGRADE_CHECKLIST.md](UPGRADE_CHECKLIST.md) after a
-Hermes upgrade and update the plugin if a seam changed.
+The plugin declares `requires_hermes: ">=0.22.5"`.
 
 ## Configuration
 
