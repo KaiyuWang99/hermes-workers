@@ -43,21 +43,30 @@ resolved launch inputs to each CLI.
 
 ## Installation
 
-Install from a Git repository:
+Hermes' catalog installer scans community plugins and blocks any plugin that
+uses private Hermes APIs. Workers uses those APIs by design (see
+[UPGRADE_CHECKLIST.md](UPGRADE_CHECKLIST.md)), so `hermes plugins install` will
+reject it with a dangerous-verdict message even with `--force`. Install it as a
+checkout instead:
 
 ```sh
-hermes plugins install KaiyuWang99/hermes-workers --enable
-```
-
-For local development, place the checkout in the plugin directory and enable it:
-
-```sh
-git clone <repo-url> ~/.hermes/plugins/workers
+mkdir -p ~/.hermes/plugins
+git clone https://github.com/KaiyuWang99/hermes-workers.git ~/.hermes/plugins/workers
 hermes plugins enable workers
 ```
 
-Restart the gateway after installing, and reload Hermes Desktop so the settings
-bundle is refreshed. Then open **Settings → Plugins → Workers**.
+To update an existing checkout:
+
+```sh
+git -C ~/.hermes/plugins/workers pull
+```
+
+Restart the gateway after installing or updating, and reload Hermes Desktop so
+the settings bundle is refreshed. Then open **Settings → Plugins → Workers**.
+
+The plugin declares `requires_hermes: ">=0.22.5"`. Because it integrates with
+private Hermes APIs, check [UPGRADE_CHECKLIST.md](UPGRADE_CHECKLIST.md) after a
+Hermes upgrade and update the plugin if a seam changed.
 
 ## Configuration
 
