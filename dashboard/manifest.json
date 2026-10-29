@@ -3,7 +3,7 @@
   "label": "Workers",
   "description": "Configure Hermes Kanban worker backends and models.",
   "icon": "Cpu",
-  "version": "1.7.0-dev.2",
+  "version": "1.7.0-dev.3",
   "tab": {
     "hidden": true
   },

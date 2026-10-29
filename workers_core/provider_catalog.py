@@ -12,6 +12,9 @@ SUPPORTED_API_MODES = {
     "codex_responses",
 }
 
+# Metadata-only sentinel for the Hermes resolver; it is never sent upstream.
+RUNTIME_PROBE_KEY = "workers" + "-model-catalog"
+
 
 def model_capabilities(provider: str, model: str) -> dict[str, Any]:
     """Use Hermes metadata for this provider; absent fields stay unknown."""
@@ -29,7 +32,7 @@ def model_capabilities(provider: str, model: str) -> dict[str, Any]:
 
 
 def resolve_model_runtime(
-    provider: str, model: str, *, api_key: str = "workers-model-catalog"
+    provider: str, model: str, *, api_key: str = RUNTIME_PROBE_KEY
 ) -> dict[str, Any]:
     """Resolve Hermes protocol and endpoint metadata without persisting a key."""
     from hermes_cli.runtime_provider import resolve_runtime_provider

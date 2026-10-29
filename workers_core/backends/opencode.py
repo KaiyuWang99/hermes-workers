@@ -21,6 +21,7 @@ from ..config import hermes_root, plugin_root, inheritance_policy
 from ..credentials import credential_status, pool_provider, require_credentials
 from ..fallbacks import fallback_entries_for
 from ..provider_catalog import (
+    RUNTIME_PROBE_KEY,
     SUPPORTED_API_MODES,
     configured_model_rows,
     ensure_opencode_session_header,
@@ -204,7 +205,7 @@ def _provider_overlay(
         explicit_key = str(resolve_entry_api_key(fallback_entry) or "").strip()
         runtime = resolve_runtime_provider(
             requested=provider,
-            explicit_api_key=explicit_key or "workers-opencode-runtime",
+            explicit_api_key=explicit_key or RUNTIME_PROBE_KEY,
             explicit_base_url=str(fallback_entry.get("base_url") or "").strip()
             or None,
             target_model=model,
@@ -216,9 +217,7 @@ def _provider_overlay(
         if explicit_key:
             runtime["credential_override"] = explicit_key
     else:
-        runtime = resolve_model_runtime(
-            provider, model, api_key="workers-opencode-runtime"
-        )
+        runtime = resolve_model_runtime(provider, model, api_key=RUNTIME_PROBE_KEY)
     api_mode = str(runtime.get("api_mode") or "").strip()
     if api_mode not in SUPPORTED_API_MODES:
         raise RuntimeError(
