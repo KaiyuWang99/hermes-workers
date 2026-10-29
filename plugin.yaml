@@ -1,0 +1,11 @@
+name: workers
+version: 1.7.0-dev.2
+description: External CLI workers for Hermes Kanban with native context and tools
+author: Kaiyu. Wang
+kind: standalone
+manifest_version: 2
+homepage: https://github.com/KaiyuWang99/hermes-workers
+license: MIT
+platforms: [darwin, linux]
+requires_hermes: ">=0.22.5"
+provides_hooks: [transform_api_error_classification]

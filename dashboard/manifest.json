@@ -1,0 +1,12 @@
+{
+  "name": "workers",
+  "label": "Workers",
+  "description": "Configure Hermes Kanban worker backends and models.",
+  "icon": "Cpu",
+  "version": "1.7.0-dev.2",
+  "tab": {
+    "hidden": true
+  },
+  "entry": "dist/index.js",
+  "api": "plugin_api.py"
+}

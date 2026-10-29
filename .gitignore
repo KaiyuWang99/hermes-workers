@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.serena/
+.DS_Store
+.venv/
+node_modules/
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+.env
+.env.*
+# Hermes HOME skeleton, recreated if a process points HERMES_HOME at this directory
+/audio_cache/
+/cron/
+/image_cache/
+/logs/
+/memories/
+/pairing/
+/sessions/
+/skills/
