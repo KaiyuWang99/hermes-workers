@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Lint
+        run: ruff check --select F401,F811,F841,F821,B018,B006 workers_core dashboard
+      - name: Compile Python
+        run: python -m compileall -q workers_core dashboard
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check desktop bundle syntax
+        run: node --check desktop/plugin.js
+      - name: Settings component tests
+        run: node --experimental-vm-modules tests/test_ui_settings.mjs
+      - name: Desktop registration check
+        run: node verification/desktop.mjs
