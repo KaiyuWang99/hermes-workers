@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Callable
 
 
+logger = logging.getLogger(__name__)
 _PATCH_STATE = "_workers_spawn_default"
 
 
@@ -43,11 +45,19 @@ def register(ctx) -> None:
     from .workers_core.provider_errors import correct_api_error_classification
 
     require()
-
-    from hermes_cli import kanban_db_dispatch
-
     ensure_config()
     ctx.register_hook(
         "transform_api_error_classification", correct_api_error_classification
     )
+
+    try:
+        from .workers_core.lane import register_lane
+    except Exception as exc:
+        logger.warning("Workers lane adapter unavailable; using spawn_fn fallback: %s", exc)
+        register_lane = None
+    if register_lane is not None and register_lane(ctx):
+        return
+
+    from hermes_cli import kanban_db_dispatch
+
     ctx.on_unload(_install_spawn_default(kanban_db_dispatch))
