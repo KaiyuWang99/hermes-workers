@@ -4,24 +4,33 @@ import pytest
 
 from workers_core import config
 from workers_core.backend_registry import BACKENDS, EXTERNAL_BACKENDS, get_backend
-from workers_core.backends import claudecode, codex, opencode
+from workers_core.backends import claudecode, codex, opencode, qoder
 
 
 def test_static_backend_specs_are_complete_and_public_view_is_limited():
-    assert set(BACKENDS) == {"native", "claude-code", "opencode", "codex"}
+    assert set(BACKENDS) == {"native", "claude-code", "opencode", "codex", "qoder"}
     assert {spec.id for spec in EXTERNAL_BACKENDS} == {
         "claude-code",
         "opencode",
         "codex",
+        "qoder",
     }
     assert get_backend("native").label == "Hermes Native"
     assert get_backend("claude-code").label == "Claude Code"
     assert get_backend("opencode").label == "OpenCode Worker"
     assert get_backend("codex").label == "Codex"
+    assert get_backend("qoder").label == "Qoder Worker"
     assert get_backend("claude-code").inherit_credentials is True
     assert get_backend("claude-code").supervises_children is True
     assert get_backend("opencode").supervises_children is True
     assert get_backend("codex").supervises_children is False
+    assert get_backend("qoder").supervises_children is True
+    assert get_backend("qoder").selection_fields == (
+        "model",
+        "reasoning_effort",
+        "binary",
+        "permission_mode",
+    )
     assert get_backend("native").selection_fields == ()
     assert get_backend("opencode").selection_fields == (
         "model",
@@ -92,6 +101,10 @@ def test_backend_owned_settings_validation():
     with pytest.raises(ValueError, match="ignore_user_config"):
         codex.validate_settings(
             {**codex.defaults(), "ignore_user_config": "false"}
+        )
+    with pytest.raises(ValueError, match="permission_mode"):
+        qoder.validate_settings(
+            {**qoder.defaults(), "permission_mode": "always_ask"}
         )
 
 

@@ -7,6 +7,8 @@ import os
 import sys
 from typing import Any
 
+from .common_mcp import WORKER_MCP_SERVER
+
 
 def _toolsets(key: str = "WORKERS_HERMES_TOOLSETS") -> list[str]:
     try:
@@ -50,7 +52,7 @@ def create_server():
     unsupported = set(_AGENT_LOOP_TOOLS) - {"session_search"}
     exposed_tools = [name for name in functions if name not in unsupported]
     server = MCPServer(
-        "hermes-worker",
+        WORKER_MCP_SERVER,
         instructions="Hermes tools enabled for this Kanban Worker profile.",
     )
     task_id = os.environ.get("HERMES_KANBAN_TASK") or None

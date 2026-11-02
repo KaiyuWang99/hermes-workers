@@ -217,7 +217,7 @@ def _diagnostic_checks(backend: str, result: dict[str, Any], *, scope: str) -> d
         auth["source"] = f"{backend}-login"
         auth["status"] = "passed" if result["login_ok"] else "failed"
         if not result["login_ok"]:
-            auth["message"] = "Codex login is unavailable."
+            auth["message"] = f"{get_backend(backend).label} login is unavailable."
     elif backend != "native":
         credential = result.get("credential") or {}
         auth.update(source="hermes-credential-pool", configured=bool(credential.get("configured")))

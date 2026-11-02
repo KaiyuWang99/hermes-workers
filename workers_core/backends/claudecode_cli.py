@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import os
 import re
-import shutil
 import subprocess
 from functools import lru_cache
-from pathlib import Path
 from typing import Any
+
+from ..executables import resolve_executable
 
 _FLAG_RE = re.compile(r"(?<!\w)--[a-z][A-Za-z0-9-]*")
 # Claude Code renders a flag family as one abbreviated entry (`--x[-file]`) in its help
@@ -26,13 +26,7 @@ _CHOICE_FLAGS = (
 
 
 def _resolve_binary(value: str) -> str | None:
-    raw = str(value or "").strip()
-    if not raw:
-        return None
-    path = Path(raw).expanduser()
-    if path.is_file() and os.access(path, os.X_OK):
-        return str(path.resolve())
-    return shutil.which(raw)
+    return resolve_executable(value)
 
 
 def _binary_stamp(binary: str) -> int:

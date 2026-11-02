@@ -106,13 +106,14 @@ def test_changed_enabled_backends_use_registry_selection_validators(tmp_path, mo
     monkeypatch.setenv("HERMES_HOME", str(tmp_path / "home"))
     api = load_api()
     from workers_core.config import default_config
-    from workers_core.backends import claudecode, codex, opencode
+    from workers_core.backends import claudecode, codex, opencode, qoder
 
     previous = default_config()
     draft = default_config()
     draft["workers"]["opencode"].update(enabled=True, model="provider/model")
     draft["workers"]["codex"].update(enabled=True, model="codex-model")
     draft["workers"]["claude-code"].update(enabled=True, model="provider/model")
+    draft["workers"]["qoder"].update(enabled=True, model="Auto")
     monkeypatch.setattr(api, "load_config", lambda: previous)
 
     validation_calls = []
@@ -120,6 +121,7 @@ def test_changed_enabled_backends_use_registry_selection_validators(tmp_path, mo
         ("opencode", opencode),
         ("codex", codex),
         ("claude-code", claudecode),
+        ("qoder", qoder),
     ):
         monkeypatch.setattr(
             module,
@@ -142,11 +144,17 @@ def test_changed_enabled_backends_use_registry_selection_validators(tmp_path, mo
 
     assert api.put_configuration({"configuration": draft}) == {"ok": True}
 
-    assert [item[0] for item in validation_calls] == ["opencode", "codex", "claude-code"]
+    assert [item[0] for item in validation_calls] == [
+        "opencode",
+        "codex",
+        "claude-code",
+        "qoder",
+    ]
     assert validation_calls[0][2] is None
     assert validation_calls[1][2] == codex_rows
     assert validation_calls[2][2] is None
-    assert cache_reads == ["codex"]
+    assert validation_calls[3][2] == codex_rows
+    assert cache_reads == ["codex", "qoder"]
     assert len(saved) == 1
 
 

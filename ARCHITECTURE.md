@@ -13,8 +13,8 @@ Hermes Kanban dispatch
 
 Hermes owns the board lifecycle and runtime services. The router selects an
 adapter and resolves one context snapshot; adapters serialize it for their CLI.
-Native workers call the original launcher. Claude, OpenCode and Codex are peer
-adapters, not subtypes of the Claude implementation.
+Native workers call the original launcher. Claude, OpenCode, Codex and Qoder
+are peer adapters, not subtypes of the Claude implementation.
 
 | Module | Responsibility |
 | --- | --- |
@@ -94,6 +94,15 @@ Codex exposes no structured upstream status in `exec --json`; its runner records
 `turn.failed`/`error` messages and the classifier verdict, but never rotates or
 falls back. Codex keeps its own login and fallback chain.
 
+Qoder runs `qoderclicn --print` with a private `--mcp-config` and
+`--strict-mcp-config`. Its default `auto` permission mode runs safe reads,
+workspace edits and shell commands without a terminal, while explicitly allowing
+`mcp__hermes-worker__*` so Kanban transitions do not depend on a classifier.
+Qoder keeps its own login. The adapter strips `QODER_AGENT_SDK_*`,
+`QODER_SDK_*` and `QODER_SESSION_TYPE` from the child environment, because a CLI
+launched from inside a Qoder session otherwise rejects headless mode with
+`sdk_worker_removed`.
+
 ## Compatibility and remaining coupling
 
 The configuration schema and unknown user fields are retained. Explicit existing
@@ -102,11 +111,13 @@ default/assignee routes remain in place. Provider routing itself follows Hermes'
 resolver; an explicit fallback entry may pin `api_mode`/`base_url` for one
 route. These are deliberate policy, not model-picker allowlists.
 
-The entrypoint installs one reversible wrapper: the dispatch `spawn_fn`. Hermes
-resolves the managed Kanban worker route (including `api_mode`) inside
+On Hermes builds that expose `kanban_worker_lanes`, the entrypoint registers the
+Workers lane. Older builds (including the current 0.22.5 line) fall back to one
+reversible wrapper: the dispatch `spawn_fn`. Hermes resolves the managed Kanban
+worker route (including `api_mode`) inside
 `agent.managed_worker._construct_agent` via `worker_route`; Workers does not
-patch that constructor and keeps no provider-to-protocol table. The wrapper is a
-private integration point, so an upstream rename can break this adapter. See
+patch that constructor and keeps no provider-to-protocol table. The fallback is a
+private integration point, so an upstream rename can break it. See
 [`UPGRADE_CHECKLIST.md`](UPGRADE_CHECKLIST.md) for the migration gates.
 
 Supporting another CLI still requires an actual adapter and appropriate local

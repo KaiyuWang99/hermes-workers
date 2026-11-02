@@ -16,7 +16,7 @@ from typing import Any
 
 from .common_context import _profile_context_prompt, protocol_prompt
 from .common_env import build_worker_env, worker_mcp_env, worker_toolsets
-from .common_mcp import inherited_mcp_toolsets, worker_mcp_servers
+from .common_mcp import WORKER_MCP_SERVER, inherited_mcp_toolsets, worker_mcp_servers
 from .contracts import WorkerLaunchContext
 
 
@@ -118,7 +118,7 @@ def build_launch_context(
     # Launch the MCP server through Hermes' active dependency generation like
     # the runners: a bare sys.executable cannot import Hermes' dependencies.
     mcp_command = worker_runner_command("workers_core.capability_mcp")
-    servers["hermes-worker"] = {
+    servers[WORKER_MCP_SERVER] = {
         "command": mcp_command[0],
         "args": mcp_command[1:],
         "cwd": str(plugin_root()),

@@ -13,6 +13,7 @@ resolved launch inputs to each CLI.
 | Claude Code | Hermes SDK model menu | Configured CLI's `--help` | Native Claude loop; direct Anthropic routes or the local protocol bridge |
 | OpenCode | Hermes SDK model menu | Selected provider/model's CLI `variants` | Native OpenCode loop; Hermes credential overlays |
 | Codex | Codex `model/list` | Selected model's advertised reasoning efforts | `codex exec --json`; failures are recorded, not rotated or fallen back |
+| Qoder Worker | Qoder CLI `--list-models` | Qoder CLI reasoning levels (`auto` … `ultracode`) | `qoderclicn --print` headless; Qoder CN login, Kanban MCP over stdio |
 
 ## Features
 
@@ -24,8 +25,8 @@ resolved launch inputs to each CLI.
 - Backend-specific option sources instead of one universal effort list.
 - Hermes-owned credential pool and provider resolution; no provider aliases or
   endpoint tables in the plugin.
-- Shared Hermes fallback chain for Claude Code and OpenCode. Codex keeps its own
-  login and fallback behavior.
+- Shared Hermes fallback chain for Claude Code and OpenCode. Codex and Qoder
+  keep their own login and fallback behavior.
 - Labeled environment checks that never save the draft or run a model task.
 - Per-assignee routing through `routes_by_assignee`; the settings page edits one
   external backend at a time.
@@ -38,6 +39,9 @@ resolved launch inputs to each CLI.
   - Claude Code: a current CLI; optional flags are detected at runtime.
   - OpenCode: a current CLI.
   - Codex CLI `0.165+` for `exec --json`.
+  - Qoder CN CLI (`qoderclicn`) with a completed `qoderclicn login`; the
+    international `qoder` binary is also recognized. Install it from
+    <https://docs.qoder.cn/cli/installation>.
 - Provider credentials configured in Hermes (credential pool or model config).
   The plugin does not store API keys in this repository.
 
@@ -101,6 +105,7 @@ the stored `workers.<backend>` entry and validated by that backend:
 | Claude Code | model, reasoning, native MCP, native Skills, settings sources, permission mode, hook sync | `binary`, `no_session_persistence`, `tools`, `disallowed_tools`, `silent_timeout_seconds`, `pin_model_aliases`, `pin_subagent_model` |
 | OpenCode | model, variant, user/project configuration inheritance | `binary`, `agent` |
 | Codex | model, reasoning, fast tier, user configuration | `binary`, `codex_home`, `sandbox`, `network_access`, `ephemeral` |
+| Qoder Worker | model, reasoning | `binary`, `permission_mode` |
 | Hermes Native | none (uses Hermes profile settings) | none |
 
 Empty `tools: []` is passed as `--tools ""`, which Claude Code documents as
@@ -128,6 +133,23 @@ switch models; Codex keeps its own login and fallback chain. Its generated MCP
 servers use `default_tools_approval_mode="approve"` because an unattended worker
 cannot answer an approval prompt under `approval_policy=never`; the Codex
 sandbox and network settings still apply to shell commands.
+
+### Qoder Worker
+
+Qoder runs in headless print mode with `--mcp-config` and
+`--strict-mcp-config`, so only the task bridge and inherited Hermes MCP servers
+are visible. The default `auto` permission mode needs no operator: safe reads,
+workspace edits and shell commands run, while risky actions are rejected instead
+of waiting for an approval prompt. `mcp__hermes-worker__*` is explicitly allowed
+so Kanban state changes never depend on a classifier decision.
+
+The model and reasoning controls map to `--model` and `--reasoning-effort`;
+leaving reasoning empty keeps the CLI default. The adapter strips Qoder's
+`QODER_AGENT_SDK_*`, `QODER_SDK_*` and `QODER_SESSION_TYPE` markers from the
+child environment. Without that, a CLI
+launched from inside a Qoder session rejects headless mode with
+`sdk_worker_removed`. Qoder authenticates through its own `qoderclicn login`;
+Workers never reads or stores that credential.
 
 ## Adding another backend
 

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
+from ..common_mcp import write_mcp_config
 from .claudecode_cli import _cli_flags, _resolve_binary, _supports
 from .claudecode_runtime import _effective_target
 
@@ -15,13 +15,7 @@ def _mcp_config(
     servers: dict[str, dict[str, Any]],
 ) -> Path:
     """Write the MCP definition into this run's private directory."""
-    target = run_dir / "mcp.json"
-    target.write_text(
-        json.dumps({"mcpServers": servers}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    target.chmod(0o600)
-    return target
+    return write_mcp_config(run_dir, servers)
 
 
 def _system_prompt_file(run_dir: Path, content: str) -> Path:

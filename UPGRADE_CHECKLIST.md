@@ -10,9 +10,10 @@ runtime interpreter and the test command from README's Development section.
 
 Workers no longer patches `agent.managed_worker._construct_agent`. Current
 Hermes resolves the Kanban worker route (including `api_mode`) inside
-`_construct_agent` via `worker_route`; the plugin only replaces the dispatch
-`spawn_fn`. Upgrade check: confirm `_construct_agent` still merges
-`worker_route` for Kanban workers. If Hermes moves that resolution, native
+`_construct_agent` via `worker_route`; the plugin registers a worker lane when
+`kanban_worker_lanes` exists and otherwise replaces the dispatch `spawn_fn`.
+Upgrade check: confirm `_construct_agent` still merges `worker_route` for Kanban
+workers. If Hermes moves that resolution, native
 workers may lose `api_mode`, but the plugin must not re-implement the route.
 Verify: `python -c "import inspect; from agent.managed_worker import _construct_agent; print(inspect.getsource(_construct_agent))"`.
 
@@ -26,9 +27,10 @@ Verify: `python -c "import inspect; from agent.managed_worker import _construct_
   Verify: `node --check desktop/plugin.js`, then load the page in Desktop. The
   VM tests stub every imported name, so they cannot catch a removed SDK export.
 - Check each `backend.id` branch against real CLI-specific settings. Keep Claude
-  hooks/settings, OpenCode configuration controls and Codex service tiers
-  explicit; do not add a generic settings schema for options only one CLI
-  supports. Verify: `node --experimental-vm-modules tests/test_ui_settings.mjs`.
+  hooks/settings, OpenCode configuration controls, Codex service tiers and
+  Qoder headless permission handling explicit; do not add a generic settings
+  schema for options only one CLI supports. Verify:
+  `node --experimental-vm-modules tests/test_ui_settings.mjs`.
 - Confirm common model and option rows still come from `/state` -> `backends`
   and `/options/{backend}`, with stale requests scoped to the active profile and
   connection. Otherwise a profile switch can show another profile's catalog.

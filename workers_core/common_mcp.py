@@ -2,7 +2,24 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any, Iterable
+
+WORKER_MCP_SERVER = "hermes-worker"
+
+
+def write_mcp_config(
+    run_dir: Path, servers: dict[str, dict[str, Any]]
+) -> Path:
+    """Write one run's MCP definition with owner-only permissions."""
+    target = run_dir / "mcp.json"
+    target.write_text(
+        json.dumps({"mcpServers": servers}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    target.chmod(0o600)
+    return target
 
 
 def worker_mcp_servers(

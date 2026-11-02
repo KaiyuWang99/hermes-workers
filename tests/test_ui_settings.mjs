@@ -78,12 +78,14 @@ assert.equal(settingsEntry.props.embedded, true); assert.equal(scopedPage.type, 
 const original = { schema: 'workers-config-v1', config_path: '/display-only', default_worker: 'opencode', routes_by_assignee: { legacy: 'codex' }, unknown_setting: { preserved: true }, workers: {
   opencode: { enabled: true, binary: '/test/opencode', model: 'legacy/retired-open', reasoning_effort: 'high', retained: 'open' },
   codex: { enabled: true, binary: '/test/codex', model: 'retired-codex', reasoning_effort: 'high', service_tier: 'flex', retained: 'codex' },
+  qoder: { enabled: false, binary: '/test/qoderclicn', model: '', reasoning_effort: '', permission_mode: 'auto', retained: 'qoder' },
   'claude-code': { enabled: true, binary: '/test/claude', model: 'custom/retired-claude', reasoning_effort: 'high', sync_hermes_hooks: true, hermes_hook_selection: { approved: true, unknownHook: false }, pin_model_aliases: true, pin_subagent_model: true, retained: 'claude' }
 } }
 const backendMetadata = [
   { id: 'claude-code', label: 'Claude Code', model_source: 'hermes', option_kind: 'effort' },
   { id: 'opencode', label: 'OpenCode Worker', model_source: 'hermes', option_kind: 'variant' },
-  { id: 'codex', label: 'Codex', model_source: 'cli', option_kind: 'reasoning_effort' }
+  { id: 'codex', label: 'Codex', model_source: 'cli', option_kind: 'reasoning_effort' },
+  { id: 'qoder', label: 'Qoder Worker', model_source: 'cli', option_kind: 'reasoning_effort' }
 ]
 const nativeCatalog = [
   { slug: 'anthropic', name: 'Anthropic', aliases: ['claude'], models: ['available-native'] },
@@ -264,7 +266,7 @@ function createPage(configuration = original, handlers = {}, options = {}) {
 // metadata order, while each enabled backend's existing configuration panel
 // follows the complete switch group.
 {
-  const orderedBackends = ['opencode', 'codex', 'claude-code'].map(id => backendMetadata.find(backend => backend.id === id))
+  const orderedBackends = ['opencode', 'codex', 'claude-code', 'qoder'].map(id => backendMetadata.find(backend => backend.id === id))
   for (const activeBackend of ['codex', 'claude-code']) {
     const configuration = clone(original)
     for (const worker of Object.values(configuration.workers)) worker.enabled = false

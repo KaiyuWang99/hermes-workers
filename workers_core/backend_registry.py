@@ -85,6 +85,15 @@ BACKENDS: dict[str, BackendSpec] = {
             "permission_mode",
         ),
     ),
+    "qoder": BackendSpec(
+        id="qoder",
+        label="Qoder Worker",
+        module="qoder",
+        model_source="cli",
+        option_kind="reasoning_effort",
+        supervises_children=True,
+        selection_fields=("model", "reasoning_effort", "binary", "permission_mode"),
+    ),
 }
 
 EXTERNAL_BACKENDS: tuple[BackendSpec, ...] = tuple(
